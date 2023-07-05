@@ -21,3 +21,7 @@ In the paper, the author used Matlab to make figures. This repository is for rew
 1. just run figure file
 
 ## Description
+
+## 説明
+
+このレポジトリは、横浜国立大学経済学部の相馬尚人ゼミで先輩の卒論研究を一緒に学習させていただく際に簡便さのために作成したものです。
