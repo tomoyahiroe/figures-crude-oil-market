@@ -6,8 +6,6 @@ library(gridExtra)
 
 # Source the custom functions
 source("modules/trivar.R")
-source("modules/irfvar.R")
-
 # Run trivar function
 source("modules/make_matrix.R")
 # Load the data and prepare the matrix
@@ -19,8 +17,7 @@ trivar_res <- trivar(data_matrix)  # Please replace your_matrix_here with the ac
 IRF <- irf(trivar_res$var_model, impulse = colnames(trivar_res$Uhat), response = colnames(trivar_res$Uhat), boot = FALSE, n.ahead = length(trivar_res$time) - trivar_res$p - 1)
 
 # Compute structural shocks Ehat from reduced form shocks Uhat
-Ehat <- solve(t(chol(trivar_res$SIGMA))) %*% t(trivar_res$Uhat[1:trivar_res$p,])
-#Ehat <- trivar_res$Ehat
+Ehat <- solve(t(chol(trivar_res$SIGMA))) %*% t(trivar_res$Uhat)
 
 
 # Cross-multiply the weights for the effect of a given shock on the real oil price (given by the relevant row of IRF) with the structural shock in question
@@ -28,8 +25,8 @@ yhat1 <- yhat2 <- yhat3 <- rep(0, length(trivar_res$time) - trivar_res$p)
 
 for(i in 1:(length(trivar_res$time) - trivar_res$p)){
   yhat1[i] <- sum(IRF$irf$V1[1:i,1] * Ehat[1, i:1])  # Replace your_var1_name with the actual variable name
-  yhat2[i] <- sum(IRF$irf$V2[1:i,1] * Ehat[2, i:1])  # Replace your_var2_name with the actual variable name
-  yhat3[i] <- sum(IRF$irf$V3[1:i,1] * Ehat[3, i:1])  # Replace your_var3_name with the actual variable name
+  yhat2[i] <- sum(IRF$irf$V2[1:i,2] * Ehat[2, i:1])  # Replace your_var2_name with the actual variable name
+  yhat3[i] <- sum(IRF$irf$V3[1:i,3] * Ehat[3, i:1])  # Replace your_var3_name with the actual variable name
 }
 
 # Create dataframe for plotting
@@ -50,7 +47,7 @@ plot_data3 <- data.frame(
 figure4_plotter <- function(plot_data, yhat, subtitle) {
   result <- ggplot(plot_data, aes(x = time)) +
     geom_line(aes(y = yhat), color = 'blue') +
-    ylim(-100, 100)
+    ylim(-100, 100)+
     labs(title = subtitle,
          y = "",                   
          x = "Time") +
